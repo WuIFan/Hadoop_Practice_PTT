@@ -33,15 +33,21 @@ public class ptt {
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
             //使用StringTokenizer效能會比使用split好。預設使用空白、tab或是換行當作分隔符號。
-            StringTokenizer st = new StringTokenizer(value.toString());
-            while (st.hasMoreTokens()) {
-                word.set(st.nextToken());
-                context.write(word, plugOne);
+            // StringTokenizer st = new StringTokenizer(value.toString());
+            // while (st.hasMoreTokens()) {
+            //     word.set(st.nextToken());
+            //     context.write(word, plugOne);
+            // }
+            String toSeg = value.toString().split(",")[1];
+            List<String> list = segment(toSeg);
+            for (String l : list) {
+                word.set(l);
+                context.write(word,plugOne);
             }
         }
     }
 
-    public List<String> segment(String str) throws IOException{
+    public static List<String> segment(String str) throws IOException{
         //byte[] byt = str.getBytes();
         //InputStream is = new ByteArrayInputStream(byt);
         StringReader reader = new StringReader(str);
