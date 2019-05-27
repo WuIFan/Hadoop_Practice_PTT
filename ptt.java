@@ -79,9 +79,14 @@ public class ptt {
             for (IntWritable val : values) {
                 reduceSum += val.get();
             }
-            result.set(reduceSum);
-            System.out.println(key);
-            context.write(key, result);
+            if (reduceSum > 2) {
+                result.set(reduceSum);
+                System.out.println(key);
+                context.write(key, result);
+            } else {
+
+            }
+            
         }
     }
 
