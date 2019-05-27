@@ -21,18 +21,18 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 
+import org.apache.hadoop.io.WritableComparator;
+
 public class ptt {
     public static class WordCountMapper
             extends Mapper<Object, Text, Text, IntWritable>{
 
-        //計數使用，設定為1。每當找到相同的字就會+1。
         private final static IntWritable plugOne  = new IntWritable(1);
         private Text word = new Text();
 
         @Override
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
-            //使用StringTokenizer效能會比使用split好。預設使用空白、tab或是換行當作分隔符號。
             // StringTokenizer st = new StringTokenizer(value.toString());
             // while (st.hasMoreTokens()) {
             //     word.set(st.nextToken());
@@ -90,6 +90,52 @@ public class ptt {
         }
     }
 
+    public static class SortMapper
+            extends Mapper<Object, Text, Text, IntWritable>{
+
+        private final static IntWritable plugOne  = new IntWritable(1);
+        private Text word = new Text();
+
+        @Override
+        public void map(Object key, Text value, Context context
+        ) throws IOException, InterruptedException {
+            
+            String[] toSplit = value.toString().split("\t");
+            word.set(toSplit[0] + "2");
+            int num = Integer.valueOf(toSplit[1]);
+            context.write(word,new IntWritable(num));
+        }
+    }
+
+    public static class SortReducer
+            extends Reducer<Text,IntWritable,Text,IntWritable> {
+
+        private IntWritable result = new IntWritable();
+
+        @Override
+        public void reduce(Text key, Iterable<IntWritable> values,
+                           Context context
+        ) throws IOException, InterruptedException {
+                context.write(key, result);
+        }
+    }
+
+    public static class DescComparator extends WritableComparator{
+ 
+		protected DescComparator() {
+			super(IntWritable.class,true);
+		}
+ 
+		@Override
+		public int compare(byte[] arg0, int arg1, int arg2, byte[] arg3,
+				int arg4, int arg5) {
+			return -super.compare(arg0, arg1, arg2, arg3, arg4, arg5);
+		}
+		@Override
+		public int compare(Object a,Object b){
+			return -super.compare(a, b);
+		}
+	}
 
     public static void main(String[] args) throws Exception {
         Configuration config = new Configuration();
@@ -97,14 +143,28 @@ public class ptt {
         job.setJarByClass(ptt.class);
         job.setReducerClass(WordCountReducer.class);
         job.setMapperClass(WordCountMapper.class);
-        //設定setCombinerClass後，每個mapper會在sorting後，對結果先做一次reduce
-        job.setCombinerClass(WordCountReducer.class);
+
+        // job.setCombinerClass(WordCountReducer.class);
+        // job.setSortComparatorClass(DescComparator.class);
+
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
-        //執行程式時，第一個參數（agrs[0]）為欲計算檔案路徑
+
         FileInputFormat.addInputPath(job, new Path(args[0]));
-        //第二個參數（agrs[1]）為計算結果存放路徑
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+
+        //job 2
+        Job job2 = Job.getInstance(config, "ptt sort");
+        job2.setJarByClass(ptt.class);
+        job2.setReducerClass(SortReducer.class);
+        job2.setMapperClass(SortMapper.class);
+        job2.setOutputKeyClass(Text.class);
+        job2.setOutputValueClass(IntWritable.class);
+        FileInputFormat.addInputPath(job2, new Path(args[1]));
+        FileOutputFormat.setOutputPath(job2, new Path(args[2]));
+
+        if (job.waitForCompletion(true)){
+            System.exit(job2.waitForCompletion(true) ? 0 : 1);
+        }  
     }
 }
