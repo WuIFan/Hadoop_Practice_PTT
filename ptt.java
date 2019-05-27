@@ -38,10 +38,14 @@ public class ptt {
             //     word.set(st.nextToken());
             //     context.write(word, plugOne);
             // }
-            String toSeg = value.toString().split(",")[1];
+            String[] toSplit = value.toString().split(",");
+            String toSeg = toSplit[1];
+            String[] date = toSplit[0].split(" ");
+            String dateFormat = date[0] + " " + date[1] + " " + date[2] + " " + date[4] + " " ;
+            // String toSeg = value.toString().split(",")[1];
             List<String> list = segment(toSeg);
             for (String l : list) {
-                word.set(l);
+                word.set(dateFormat + l);
                 context.write(word,plugOne);
             }
         }
