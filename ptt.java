@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.io.StringReader;
 
 import org.apache.hadoop.io.WritableComparator;
+import org.apache.hadoop.io.WritableComparable;
 
 public class ptt {
     public static class WordCountMapper
@@ -38,15 +39,19 @@ public class ptt {
             //     word.set(st.nextToken());
             //     context.write(word, plugOne);
             // }
-            String[] toSplit = value.toString().split(",");
-            String toSeg = toSplit[1];
-            String[] date = toSplit[0].split(" ");
-            String dateFormat = date[0] + " " + date[1] + " " + date[2] + " " + date[4] + " " ;
-            // String toSeg = value.toString().split(",")[1];
-            List<String> list = segment(toSeg);
-            for (String l : list) {
-                word.set(dateFormat + l);
-                context.write(word,plugOne);
+            try {
+                String[] toSplit = value.toString().split(",");
+                String toSeg = toSplit[1];
+                String[] date = toSplit[0].split(" ");
+                String dateFormat = date[0] + " " + date[1] + " " + date[2] + " " + date[4] + " " ;
+                // String toSeg = value.toString().split(",")[1];
+                List<String> list = segment(toSeg);
+                for (String l : list) {
+                    word.set(dateFormat + l);
+                    context.write(word,plugOne);
+                }
+            }  catch (Exception e) {
+                //TODO: handle exception
             }
         }
     }
@@ -79,7 +84,7 @@ public class ptt {
             for (IntWritable val : values) {
                 reduceSum += val.get();
             }
-            if (reduceSum > 2) {
+            if (reduceSum > 9) {
                 result.set(reduceSum);
                 // System.out.println(key);
                 context.write(key, result);
@@ -112,7 +117,7 @@ public class ptt {
 
             private IntWritable result = new IntWritable();
 
-        @Override
+        //@Override
         public void reduce(Text key, Iterable<IntWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
@@ -121,26 +126,28 @@ public class ptt {
                 reduceSum += val.get();
             }
             result.set(reduceSum);
-            context.write(key, result);
+            context.write(key,result);
         }
     }
 
-    public static class DescComparator extends WritableComparator{
- 
-		protected DescComparator() {
-			super(IntWritable.class,true);
-		}
- 
-		@Override
-		public int compare(byte[] arg0, int arg1, int arg2, byte[] arg3,
-				int arg4, int arg5) {
-			return -super.compare(arg0, arg1, arg2, arg3, arg4, arg5);
-		}
-		@Override
-		public int compare(Object a,Object b){
-			return -super.compare(a, b);
-		}
-	}
+    // public class hot implements WritableComparable<hot> {
+
+    //     private String date;
+    //     private String title;
+    //     private int num;
+
+    //     public hot(String date,String title,Int num) {
+    //         this.date = date;
+    //         this.title = title;
+    //         this.num = num;
+    //     }
+
+    //     public void set(String date,String title,Int num) {
+    //         this.date = date;
+    //         this.title = title;
+    //         this.num = num;
+    //     }
+    // }
 
     public static void main(String[] args) throws Exception {
         Configuration config = new Configuration();
@@ -159,17 +166,26 @@ public class ptt {
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
         //job 2
-        Job job2 = Job.getInstance(config, "ptt sort");
-        job2.setJarByClass(ptt.class);
-        job2.setReducerClass(SortReducer.class);
-        job2.setMapperClass(SortMapper.class);
-        job2.setOutputKeyClass(Text.class);
-        job2.setOutputValueClass(IntWritable.class);
-        FileInputFormat.addInputPath(job2, new Path(args[1]));
-        FileOutputFormat.setOutputPath(job2, new Path(args[2]));
+        // Job job2 = Job.getInstance(config, "ptt sort");
+        // job2.setJarByClass(ptt.class);
+        // job2.setReducerClass(SortReducer.class);
+        // job2.setMapperClass(SortMapper.class);
 
-        if (job.waitForCompletion(true)){
-            System.exit(job2.waitForCompletion(true) ? 0 : 1);
-        }  
+        // job2.setOutputKeyClass(Text.class);
+        // job2.setOutputValueClass(IntWritable.class);
+
+        //job2.setMapOutputKeyClass(IntWritable.class);
+        //job2.setMapOutputValueClass(Text.class);
+        //sort
+        //job2.setSortComparatorClass(DescComparator.class);
+
+        //FileInputFormat.addInputPath(job2, new Path(args[1]));
+        //FileOutputFormat.setOutputPath(job2, new Path(args[2]));
+
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
+
+        // if (job.waitForCompletion(true)){
+        //     System.exit(job2.waitForCompletion(true) ? 0 : 1);
+        // }  
     }
 }
