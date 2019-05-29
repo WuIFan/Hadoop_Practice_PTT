@@ -81,7 +81,7 @@ public class ptt {
             }
             if (reduceSum > 2) {
                 result.set(reduceSum);
-                System.out.println(key);
+                // System.out.println(key);
                 context.write(key, result);
             } else {
 
@@ -101,22 +101,27 @@ public class ptt {
         ) throws IOException, InterruptedException {
             
             String[] toSplit = value.toString().split("\t");
-            word.set(toSplit[0] + "2");
-            int num = Integer.valueOf(toSplit[1]);
-            context.write(word,new IntWritable(num));
+            word.set(toSplit[0]);
+            IntWritable num = new IntWritable(Integer.parseInt(toSplit[1]));
+            context.write(word,num);
         }
     }
 
     public static class SortReducer
             extends Reducer<Text,IntWritable,Text,IntWritable> {
 
-        private IntWritable result = new IntWritable();
+            private IntWritable result = new IntWritable();
 
         @Override
         public void reduce(Text key, Iterable<IntWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
-                context.write(key, result);
+            int reduceSum = 0;
+            for (IntWritable val : values) {
+                reduceSum += val.get();
+            }
+            result.set(reduceSum);
+            context.write(key, result);
         }
     }
 
