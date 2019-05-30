@@ -47,7 +47,8 @@ public class ptt {
                 // String toSeg = value.toString().split(",")[1];
                 List<String> list = segment(toSeg);
                 for (String l : list) {
-                    word.set(dateFormat + l);
+                    // word.set(dateFormat + l);
+                    word.set(l);
                     context.write(word,plugOne);
                 }
             }  catch (Exception e) {
@@ -96,9 +97,8 @@ public class ptt {
     }
 
     public static class SortMapper
-            extends Mapper<Object, Text, Text, IntWritable>{
+            extends Mapper<Object, Text, IntWritable, Text>{
 
-        private final static IntWritable plugOne  = new IntWritable(1);
         private Text word = new Text();
 
         @Override
@@ -106,27 +106,34 @@ public class ptt {
         ) throws IOException, InterruptedException {
             
             String[] toSplit = value.toString().split("\t");
+
+
+            // String data = toSplit[0].split(" ")[4];
+            // word.set(data);
             word.set(toSplit[0]);
             IntWritable num = new IntWritable(Integer.parseInt(toSplit[1]));
-            context.write(word,num);
+            context.write(num,word);
         }
     }
 
     public static class SortReducer
-            extends Reducer<Text,IntWritable,Text,IntWritable> {
+            extends Reducer<IntWritable,Text,Text,IntWritable> {
 
-            private IntWritable result = new IntWritable();
+            //private IntWritable result = new IntWritable();
 
         //@Override
-        public void reduce(Text key, Iterable<IntWritable> values,
+        public void reduce(IntWritable key,Text  values,
                            Context context
         ) throws IOException, InterruptedException {
-            int reduceSum = 0;
-            for (IntWritable val : values) {
-                reduceSum += val.get();
-            }
-            result.set(reduceSum);
-            context.write(key,result);
+            // int reduceSum = 0;
+            // for (IntWritable val : values) {
+            //     reduceSum += val.get();
+            // }
+            // result.set(reduceSum);
+            // context.write(key,result);
+            // for(Text value : values){
+                context.write(values, key);
+            // }
         }
     }
 
@@ -149,6 +156,17 @@ public class ptt {
     //     }
     // }
 
+
+    // public class IntWritableDecreasingComparator extends Comparator {
+    //     @SuppressWarnings("rawtypes")
+    //     public int compare( WritableComparable a,WritableComparable b){
+    //         return -super.compare(a, b);
+    //     }
+    //     public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+    //         return -super.compare(b1, s1, l1, b2, s2, l2);
+    //     }
+    // }
+
     public static void main(String[] args) throws Exception {
         Configuration config = new Configuration();
         Job job = Job.getInstance(config, "ptt word count");
@@ -166,26 +184,27 @@ public class ptt {
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
         //job 2
-        // Job job2 = Job.getInstance(config, "ptt sort");
-        // job2.setJarByClass(ptt.class);
-        // job2.setReducerClass(SortReducer.class);
-        // job2.setMapperClass(SortMapper.class);
+        Job job2 = Job.getInstance(config, "ptt sort");
+        job2.setJarByClass(ptt.class);
+        job2.setReducerClass(SortReducer.class);
+        job2.setMapperClass(SortMapper.class);
 
-        // job2.setOutputKeyClass(Text.class);
-        // job2.setOutputValueClass(IntWritable.class);
+        job2.setOutputKeyClass(Text.class);
+        job2.setOutputValueClass(IntWritable.class);
 
-        //job2.setMapOutputKeyClass(IntWritable.class);
-        //job2.setMapOutputValueClass(Text.class);
+        job2.setMapOutputKeyClass(IntWritable.class);
+        job2.setMapOutputValueClass(Text.class);
         //sort
+        // job2.setSortComparatorClass(IntWritableDecreasingComparator.class);
         //job2.setSortComparatorClass(DescComparator.class);
 
-        //FileInputFormat.addInputPath(job2, new Path(args[1]));
-        //FileOutputFormat.setOutputPath(job2, new Path(args[2]));
+        FileInputFormat.addInputPath(job2, new Path(args[1]));
+        FileOutputFormat.setOutputPath(job2, new Path(args[2]));
 
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        //System.exit(job.waitForCompletion(true) ? 0 : 1);
 
-        // if (job.waitForCompletion(true)){
-        //     System.exit(job2.waitForCompletion(true) ? 0 : 1);
-        // }  
+        if (job.waitForCompletion(true)){
+            System.exit(job2.waitForCompletion(true) ? 0 : 1);
+        }  
     }
 }
