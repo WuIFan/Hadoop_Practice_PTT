@@ -47,8 +47,8 @@ public class ptt {
                 // String toSeg = value.toString().split(",")[1];
                 List<String> list = segment(toSeg);
                 for (String l : list) {
-                    // word.set(dateFormat + l);
-                    word.set(l);
+                    word.set(dateFormat + l);
+                    // word.set(l);
                     context.write(word,plugOne);
                 }
             }  catch (Exception e) {
@@ -87,7 +87,6 @@ public class ptt {
             }
             if (reduceSum > 9) {
                 result.set(reduceSum);
-                // System.out.println(key);
                 context.write(key, result);
             } else {
 
@@ -184,27 +183,27 @@ public class ptt {
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
         //job 2
-        Job job2 = Job.getInstance(config, "ptt sort");
-        job2.setJarByClass(ptt.class);
-        job2.setReducerClass(SortReducer.class);
-        job2.setMapperClass(SortMapper.class);
+        // Job job2 = Job.getInstance(config, "ptt sort");
+        // job2.setJarByClass(ptt.class);
+        // job2.setReducerClass(SortReducer.class);
+        // job2.setMapperClass(SortMapper.class);
 
-        job2.setOutputKeyClass(Text.class);
-        job2.setOutputValueClass(IntWritable.class);
+        // job2.setOutputKeyClass(Text.class);
+        // job2.setOutputValueClass(IntWritable.class);
 
-        job2.setMapOutputKeyClass(IntWritable.class);
-        job2.setMapOutputValueClass(Text.class);
+        // job2.setMapOutputKeyClass(IntWritable.class);
+        // job2.setMapOutputValueClass(Text.class);
         //sort
         // job2.setSortComparatorClass(IntWritableDecreasingComparator.class);
         //job2.setSortComparatorClass(DescComparator.class);
 
-        FileInputFormat.addInputPath(job2, new Path(args[1]));
-        FileOutputFormat.setOutputPath(job2, new Path(args[2]));
+        // FileInputFormat.addInputPath(job2, new Path(args[1]));
+        // FileOutputFormat.setOutputPath(job2, new Path(args[2]));
 
-        //System.exit(job.waitForCompletion(true) ? 0 : 1);
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
 
-        if (job.waitForCompletion(true)){
-            System.exit(job2.waitForCompletion(true) ? 0 : 1);
-        }  
+        // if (job.waitForCompletion(true)){
+        //     System.exit(job2.waitForCompletion(true) ? 0 : 1);
+        // }  
     }
 }
