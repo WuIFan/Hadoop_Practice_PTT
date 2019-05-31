@@ -33,7 +33,7 @@ hadoop fs -get /tmp/ptt_sort/part-r-00000
 
 ### core-site  
 
-'''
+```xml
 <configuration>
   <property>
     <name>hadoop.tmp.dir</name>
@@ -45,11 +45,11 @@ hadoop fs -get /tmp/ptt_sort/part-r-00000
     <value>hdfs://localhost:9000</value>
   </property>
 </configuration>
-'''
+```
 
 ### mapred-site.xml  
 
-'''
+```xml
 <configuration>
   <property>
     <name>mapred.job.tracker</name>
@@ -60,22 +60,22 @@ hadoop fs -get /tmp/ptt_sort/part-r-00000
     <value>yarn</value>
   </property>
 </configuration>
-'''
+```
 
 ### hdfs-site.xml
 
-'''
+```xml
 <configuration>
   <property>
     <name>dfs.replication</name>
     <value>1</value>
   </property>
 </configuration>
-'''
+```
 
 ### yarn-site.xml
 
-'''
+```xml
 <configuration>
   <property>
     <name>yarn.nodemanager.aux-services</name>
@@ -94,4 +94,35 @@ hadoop fs -get /tmp/ptt_sort/part-r-00000
   <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
   </property>
 </configuration>
-'''
+```
+
+### hadoop-env.sh
+
+```sh
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home
+export HADOOP_CONF_DIR=/usr/local/Cellar/hadoop/3.1.2/libexec/etc/hadoop
+export HADOOP_OS_TYPE=${HADOOP_OS_TYPE:-$(uname -s)}
+export HADOOP_CLASSPATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/lib/tools.jar
+```
+
+### bash_profile  
+
+export HADOOP_HOME=/usr/local/Cellar/hadoop/3.1.2/libexec  
+export PATH=$PATH:$HADOOP_HOME/bin  
+
+export JAVA_HOME_8=/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home  
+export JAVA_HOME=$JAVA_HOME_8  
+alias jdk8='export JAVA_HOME=$JAVA_HOME_8'  
+
+export HADOOP_CLASSPATH=${JAVA_HOME}/lib/tools.jar  
+
+
+## Others  
+
+### 使用外部library
+
+For example : ikanalyzer  
+put the IKAnalyzer2012_u6.jar in  
+⁨usr⁩ > ⁨local⁩ > ⁨Cellar⁩ ▸⁨ hadoop⁩ > ⁨3.1.2⁩ > ⁨libexec⁩ > ⁨share⁩ > ⁨hadoop⁩ >  common⁩  
+  
+and the IKAnalyzer.cfg.xml and other .dic should be jar in your .jar  
