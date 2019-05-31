@@ -119,10 +119,10 @@ export HADOOP_CLASSPATH=${JAVA_HOME}/lib/tools.jar
 
 ## Others  
 
-### 使用外部library
+### 使用外部library
 
 For example : ikanalyzer  
 put the IKAnalyzer2012_u6.jar in  
-⁨usr⁩ > ⁨local⁩ > ⁨Cellar⁩ ▸⁨ hadoop⁩ > ⁨3.1.2⁩ > ⁨libexec⁩ > ⁨share⁩ > ⁨hadoop⁩ >  common⁩  
+⁨usr⁩ > ⁨local⁩ > ⁨Cellar⁩ >⁨ hadoop⁩ > ⁨3.1.2⁩ > ⁨libexec⁩ > ⁨share⁩ > ⁨hadoop⁩ >  common⁩  
   
 and the IKAnalyzer.cfg.xml and other .dic should be jar in your .jar  
