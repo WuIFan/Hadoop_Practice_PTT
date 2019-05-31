@@ -22,3 +22,4 @@ hadoop jar hwcs.jar ptt  /tmp/ptt_target /tmp/ptt_result
 ### result
 hadoop fs -rmr /tmp/ptt_result  
 hadoop fs -cat /tmp/ptt_result/part-r-00000  
+hadoop fs -get /tmp/ptt_sort/part-r-00000  
