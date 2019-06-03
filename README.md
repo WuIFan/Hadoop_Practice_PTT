@@ -15,7 +15,6 @@ cd $HADOOP_HOME/sbin
 hadoop fs -mkdir -p /tmp/ptt_target  
 hadoop fs -put dateAndTitle2.txt /tmp/ptt_target  
 
-
 ### compile
 
 hadoop com.sun.tools.javac.Main ptt.java  
@@ -115,7 +114,6 @@ export JAVA_HOME=$JAVA_HOME_8
 alias jdk8='export JAVA_HOME=$JAVA_HOME_8'  
 
 export HADOOP_CLASSPATH=${JAVA_HOME}/lib/tools.jar  
-
 
 ## Others  
 
